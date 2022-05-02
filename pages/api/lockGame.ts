@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import {
     getGame,
     IGame,
+    lockGame,
     sanitizeGame,
     startGame,
 } from '../../services/game.service';
@@ -39,7 +40,7 @@ export default function handler(
     }
 
     const name = `${playerName}(guid)${playerGuid}`;
-    const game = getGame(code);
+    const game = lockGame(code, name);
 
     if (_.isNull(game)) {
         res.status(404).json({
@@ -55,15 +56,12 @@ export default function handler(
         return;
     }
 
-    const startedGame = startGame(code);
-
-    if (_.isNull(startedGame)) {
-        res.status(500).json({
-            error: `Game could not be started!`,
+    if (!game.locked) {
+        res.status(409).json({
+            error: 'Not all words were set.',
         });
-        return;
     }
 
-    res.status(200).json(sanitizeGame(startedGame, name));
+    res.status(200).json(sanitizeGame(game, name));
     return;
 }

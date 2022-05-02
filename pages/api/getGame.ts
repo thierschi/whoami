@@ -36,8 +36,6 @@ export default function handler(
     const name = `${playerName}(guid)${playerGuid}`;
     const game = getGame(code);
 
-    console.log(code, name, game);
-
     if (
         _.isNull(game) ||
         game.players.map((p) => p.name).indexOf(name) === -1

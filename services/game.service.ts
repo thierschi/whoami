@@ -118,7 +118,6 @@ export const joinGame = (code: string, name: string): IGame | null => {
     if (_.isUndefined(player)) {
         game.players.push({ name: name, word: null, partner: null });
 
-        console.log(games);
         return game;
     }
 
@@ -164,6 +163,44 @@ export const startGame = (code: string): IGame | null => {
         game.started = true;
         return game;
     }
+};
+
+export const setWord = (
+    code: string,
+    name: string,
+    word: string
+): IGame | null => {
+    const game = getGame(code);
+
+    if (
+        _.isNull(game) ||
+        game.players.filter((g) => g.name === name).length === 0 ||
+        game.locked ||
+        !game.started
+    )
+        return null;
+
+    const partnerName = game.players.filter((g) => g.name === name)[0].partner;
+    const partner = game.players.filter((g) => g.name === partnerName)[0];
+    partner.word = word;
+
+    return game;
+};
+
+export const lockGame = (code: string, name: string): IGame | null => {
+    const game = getGame(code);
+
+    if (_.isNull(game) || game.locked || !game.started) return null;
+
+    if (game.host !== name) return game;
+
+    if (game.players.filter((p) => _.isNull(p.word)).length > 0) {
+        return game;
+    }
+
+    game.locked = true;
+
+    return game;
 };
 
 export const sanitizeGame = (game_: IGame, name: string): ISanitizedGame => {
