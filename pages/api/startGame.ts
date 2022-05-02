@@ -1,19 +1,34 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getGame, IGame } from '../../services/game.service';
+import { getGame, IGame, startGame } from '../../services/game.service';
 import * as _ from 'lodash';
 
 export default function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
 ) {
-    const { code } = req.query;
+    const { code, playerName, playerGuid } = req.query;
 
     if (_.isUndefined(code) || !_.isString(code)) {
         res.status(400).json({ error: 'No code or wrong type was provided!' });
         return;
     }
 
+    if (_.isUndefined(playerName) || !_.isString(playerName)) {
+        res.status(400).json({
+            error: 'No playerName or wrong type was provided!',
+        });
+        return;
+    }
+
+    if (_.isUndefined(playerGuid) || !_.isString(playerGuid)) {
+        res.status(400).json({
+            error: 'No playerGuid or wrong type was provided!',
+        });
+        return;
+    }
+
+    const name = `${playerName}(guid)${playerGuid}`;
     const game = getGame(code);
 
     if (_.isNull(game) || game.started) {
@@ -23,33 +38,15 @@ export default function handler(
         return;
     }
 
-    while (true) {
-        const players = [...game.players];
-        let playerNames = players.map((e) => e.name);
-        const newGame: IGame = { ...game, started: true, players: [] };
-
-        for (const p of players) {
-            const player = { ...p };
-
-            const r = Math.floor(Math.random() * playerNames.length);
-            player.partner = playerNames[r];
-            playerNames = playerNames.filter((e) => e !== player.partner);
-
-            newGame.players.push(player);
-        }
-
-        let allGood = true;
-
-        for (const p of newGame.players) {
-            if (p.name === p.partner) {
-                allGood = false;
-                break;
-            }
-        }
-
-        if (!allGood) continue;
-
-        res.status(200).json(newGame);
+    if (game.host !== name) {
+        res.status(403).json({
+            error: `${name} is not host of game ${code}.`,
+        });
         return;
     }
+
+    const startedGame = startGame(code);
+
+    res.status(200).json(startedGame);
+    return;
 }

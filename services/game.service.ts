@@ -1,7 +1,8 @@
-import { connected } from 'process';
+import _ from 'lodash';
 
 export interface IGame {
     key: string;
+    host: string;
     players: {
         name: string;
         word: string | null;
@@ -14,6 +15,7 @@ export interface IGame {
 const games: IGame[] = [
     {
         key: 'test',
+        host: 'Lukas',
         players: [
             {
                 name: 'Lukas',
@@ -51,7 +53,7 @@ const games: IGame[] = [
     },
 ];
 
-export const createNewGame = () => {
+export const createNewGame = (name: string): IGame => {
     while (true) {
         let characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789';
         let code = '';
@@ -66,8 +68,16 @@ export const createNewGame = () => {
             if (g.key === code) continue;
         }
 
-        games.push({ key: code, players: [], started: false, locked: false });
-        return code;
+        const newGame = {
+            key: code,
+            host: name,
+            players: [{ name: name, word: null, partner: null }],
+            started: false,
+            locked: false,
+        };
+
+        games.push(newGame);
+        return newGame;
     }
 };
 
@@ -75,10 +85,70 @@ export const getGame = (code: string): IGame | null => {
     let game: IGame | null = null;
 
     for (const g of games) {
-        if (g.key === code && !g.locked) {
+        if (g.key === code) {
             game = g;
         }
     }
 
     return game;
+};
+
+export const joinGame = (code: string, name: string): IGame | null => {
+    let game: IGame | null = getGame(code);
+
+    if (_.isNull(game)) return null;
+
+    const player = game.players.filter(
+        (p) => p.name.split('(guid)')[0] === name.split('(guid)')[0]
+    )[0];
+
+    if (_.isUndefined(player)) {
+        game.players.push({ name: name, word: null, partner: null });
+
+        console.log(games);
+        return game;
+    }
+
+    if (player.name === name) {
+        return game;
+    }
+
+    throw new Error('Name is taken');
+};
+
+export const startGame = (code: string): IGame | null => {
+    let game: IGame | null = getGame(code);
+
+    if (_.isNull(game)) return null;
+
+    while (true) {
+        const players = [...game.players];
+        let playerNames = players.map((e) => e.name);
+        const newGame: IGame = { ...game, started: true, players: [] };
+
+        for (const p of players) {
+            const player = { ...p };
+
+            const r = Math.floor(Math.random() * playerNames.length);
+            player.partner = playerNames[r];
+            playerNames = playerNames.filter((e) => e !== player.partner);
+
+            newGame.players.push(player);
+        }
+
+        let allGood = true;
+
+        for (const p of newGame.players) {
+            if (p.name === p.partner) {
+                allGood = false;
+                break;
+            }
+        }
+
+        if (!allGood) continue;
+
+        game.players = newGame.players;
+        game.started = true;
+        return game;
+    }
 };
