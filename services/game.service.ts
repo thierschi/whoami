@@ -1,8 +1,21 @@
 import _ from 'lodash';
+import { parseRelativeUrl } from 'next/dist/shared/lib/router/utils/parse-relative-url';
 
 export interface IGame {
     key: string;
     host: string;
+    players: {
+        name: string;
+        word: string | null;
+        partner: string | null;
+    }[];
+    started: boolean;
+    locked: boolean;
+}
+
+export interface ISanitizedGame {
+    key: string;
+    host: boolean;
     players: {
         name: string;
         word: string | null;
@@ -151,4 +164,32 @@ export const startGame = (code: string): IGame | null => {
         game.started = true;
         return game;
     }
+};
+
+export const sanitizeGame = (game_: IGame, name: string): ISanitizedGame => {
+    const game = { ...game_ };
+    const sanitizedGame: ISanitizedGame = {
+        key: game.key,
+        host: game.host === name,
+        players: [],
+        started: game.started,
+        locked: game.locked,
+    };
+
+    for (const player of game.players) {
+        const newPlayer: typeof player = {
+            name:
+                player.name === name
+                    ? player.name
+                    : player.name.split('(guid)')[0],
+            word: player.name === name ? null : player.word,
+            partner: _.isNull(player.partner)
+                ? null
+                : player.partner.split('(guid)')[0],
+        };
+
+        sanitizedGame.players.push(newPlayer);
+    }
+
+    return sanitizedGame;
 };
