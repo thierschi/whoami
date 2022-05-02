@@ -1,12 +1,17 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createNewGame } from '../../services/game.service';
+import { createNewGame, sanitizeGame } from '../../services/game.service';
 import * as _ from 'lodash';
 
 export default function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
 ) {
+    if (req.method !== 'POST') {
+        res.status(405).end();
+        return;
+    }
+
     const { playerName, playerGuid } = req.query;
 
     if (_.isUndefined(playerName) || !_.isString(playerName)) {
@@ -26,5 +31,5 @@ export default function handler(
     const name = `${playerName}(guid)${playerGuid}`;
     const game = createNewGame(name);
 
-    res.status(200).json(game);
+    res.status(200).json(sanitizeGame(game, name));
 }

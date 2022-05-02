@@ -1,12 +1,22 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getGame, IGame, joinGame } from '../../services/game.service';
+import {
+    getGame,
+    IGame,
+    joinGame,
+    sanitizeGame,
+} from '../../services/game.service';
 import * as _ from 'lodash';
 
 export default function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
 ) {
+    if (req.method !== 'POST') {
+        res.status(405).end();
+        return;
+    }
+
     const { code, playerName, playerGuid } = req.query;
 
     if (_.isUndefined(code) || !_.isString(code)) {
@@ -35,7 +45,7 @@ export default function handler(
             return;
         }
 
-        res.status(200).json(game);
+        res.status(200).json(sanitizeGame(game, name));
     } catch (e) {
         res.status(409).json({
             error: `Conflicting playerName ${playerName}`,

@@ -1,12 +1,17 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getGame, IGame } from '../../services/game.service';
+import { getGame, IGame, sanitizeGame } from '../../services/game.service';
 import * as _ from 'lodash';
 
 export default function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
 ) {
+    if (req.method !== 'GET') {
+        res.status(405).end();
+        return;
+    }
+
     const { code, playerName, playerGuid } = req.query;
 
     if (_.isUndefined(code) || !_.isString(code)) {
@@ -43,12 +48,5 @@ export default function handler(
         return;
     }
 
-    const players = [...game.players];
-    const player = players.filter((p) => p.name === name)[0];
-    const cencoredPlayers = [
-        ...players.filter((p) => p.name !== name),
-        { ...player, word: null },
-    ];
-
-    res.status(200).json({ ...game, players: cencoredPlayers });
+    res.status(200).json(sanitizeGame(game, name));
 }
