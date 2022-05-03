@@ -109,7 +109,7 @@ export const startGame = (code: string): IGame | null => {
 
     if (_.isNull(game)) return null;
     if (game.players.length <= 1) return null;
--
+
     while (true) {
         const players = [...game.players];
         let playerNames = players.map((e) => e.name);
