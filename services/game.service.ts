@@ -1,29 +1,5 @@
 import _ from 'lodash';
-import { parseRelativeUrl } from 'next/dist/shared/lib/router/utils/parse-relative-url';
-
-export interface IGame {
-    key: string;
-    host: string;
-    players: {
-        name: string;
-        word: string | null;
-        partner: string | null;
-    }[];
-    started: boolean;
-    locked: boolean;
-}
-
-export interface ISanitizedGame {
-    key: string;
-    host: boolean;
-    players: {
-        name: string;
-        word: string | null;
-        partner: string | null;
-    }[];
-    started: boolean;
-    locked: boolean;
-}
+import { IGame, ISanitizedGame } from '../model/game/game.model';
 
 const games: IGame[] = [
     {

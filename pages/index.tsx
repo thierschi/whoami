@@ -4,6 +4,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import type { NextPage } from 'next';
+import { RecoilRoot } from 'recoil';
 import { App } from '../components/App';
 
 const darkTheme = createTheme({
@@ -14,10 +15,12 @@ const darkTheme = createTheme({
 
 const Home: NextPage = () => {
     return (
-        <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
-            <App />
-        </ThemeProvider>
+        <RecoilRoot>
+            <ThemeProvider theme={darkTheme}>
+                <CssBaseline />
+                <App />
+            </ThemeProvider>
+        </RecoilRoot>
     );
 };
 

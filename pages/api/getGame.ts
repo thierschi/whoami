@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { getGame, IGame, sanitizeGame } from '../../services/game.service';
 import * as _ from 'lodash';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getGame, sanitizeGame } from '../../services/game.service';
 
 export default function handler(
     req: NextApiRequest,
