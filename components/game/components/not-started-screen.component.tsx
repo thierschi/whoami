@@ -21,68 +21,21 @@ import {
 import { Box } from '@mui/system';
 import _ from 'lodash';
 import * as React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { nameAtom } from '../../../atoms/name.atom';
-import { refreshGameAtom } from '../../../atoms/refresh-game.atom';
+import { useGame } from '../../../hook/game.hook';
 import { useRefreshGame } from '../../../hook/refresh-game.hook';
-import { gameSelector } from '../../../selectors/game.selector';
 import { enableScroll } from '../../../util/scroll.util';
 
 export const NotStartedScreen = (): JSX.Element => {
-    const game = useRecoilValue(gameSelector);
-    const name = useRecoilValue(nameAtom);
+    const game = useGame();
     useRefreshGame();
 
-    // const game = {
-    //     key: 'test',
-    //     host: true,
-    //     players: [
-    //         {
-    //             name: 'Lukas',
-    //             word: null,
-    //             partner: null,
-    //         },
-    //         {
-    //             name: 'Mxi',
-    //             word: null,
-    //             partner: null,
-    //         },
-    //         {
-    //             name: 'Nico',
-    //             word: null,
-    //             partner: null,
-    //         },
-    //         {
-    //             name: 'Mauritz',
-    //             word: null,
-    //             partner: null,
-    //         },
-    //         {
-    //             name: 'Justin',
-    //             word: null,
-    //             partner: null,
-    //         },
-    //         {
-    //             name: 'Anika',
-    //             word: null,
-    //             partner: null,
-    //         },
-    //     ],
-    //     started: false,
-    //     locked: false,
-    // };
-
-    const [refreshGame, setRefreshGame] = useRecoilState(refreshGameAtom);
+    const name = useRecoilValue(nameAtom);
 
     React.useEffect(() => {
         enableScroll();
     }, []);
-
-    // React.useEffect(() => {
-    //     setTimeout(() => {
-    //         setRefreshGame(refreshGame + 1);
-    //     }, 1000);
-    // }, [refreshGame]);
 
     const onStartGameClick = React.useCallback(async () => {
         if (_.isNull(name) || _.isNull(game)) return;
@@ -96,7 +49,7 @@ export const NotStartedScreen = (): JSX.Element => {
         if (!rawRes.ok) {
             alert('Something went wrong');
         }
-    }, [name]);
+    }, [game, name]);
 
     const colors = [
         red,
@@ -122,8 +75,11 @@ export const NotStartedScreen = (): JSX.Element => {
                     sx={{ height: '100%' }}
                 >
                     <LinearProgress sx={{ width: '100%' }} />
+                    <Typography variant="h3">{game.key}</Typography>
                     <Typography variant="body1">
-                        {`${game.players.length} Spieler sind beigetreten. Warten auf weitere...`}
+                        {`${game.players.length} Spieler ${
+                            game.players.length === 1 ? 'ist' : 'sind'
+                        } beigetreten. Warten auf weitere...`}
                     </Typography>
                 </Stack>
             </Box>
@@ -137,13 +93,7 @@ export const NotStartedScreen = (): JSX.Element => {
                             avatar={
                                 <Avatar
                                     sx={{
-                                        bgcolor:
-                                            colors[
-                                                Math.floor(
-                                                    Math.random() *
-                                                        colors.length
-                                                )
-                                            ][500],
+                                        bgcolor: colors[i % colors.length][500],
                                     }}
                                     aria-label="recipe"
                                 >

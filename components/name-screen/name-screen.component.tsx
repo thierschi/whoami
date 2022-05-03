@@ -1,4 +1,4 @@
-import { Button, Stack, TextField, Typography, useTheme } from '@mui/material';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 import _ from 'lodash';
 import * as React from 'react';
 import { useSetRecoilState } from 'recoil';
@@ -7,7 +7,6 @@ import { guid } from '../../util/guid.util';
 import { saveNameToLS } from '../../util/local-storage.util';
 
 export const NameScreen: React.FunctionComponent = (): JSX.Element => {
-    const theme = useTheme();
     const setName = useSetRecoilState(nameAtom);
 
     const [nameString, setNameString] = React.useState<string>();

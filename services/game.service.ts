@@ -91,7 +91,7 @@ export const joinGame = (code: string, name: string): IGame | null => {
         (p) => p.name.split('(guid)')[0] === name.split('(guid)')[0]
     )[0];
 
-    if (_.isUndefined(player)) {
+    if (_.isUndefined(player) && !game.started) {
         game.players.push({ name: name, word: null, partner: null });
 
         return game;
@@ -195,7 +195,12 @@ export const sanitizeGame = (game_: IGame, name: string): ISanitizedGame => {
                 player.name === name
                     ? player.name
                     : player.name.split('(guid)')[0],
-            word: player.name === name ? null : player.word,
+            word:
+                player.name === name
+                    ? _.isNull(player.word)
+                        ? null
+                        : ''
+                    : player.word,
             partner: _.isNull(player.partner)
                 ? null
                 : player.partner.split('(guid)')[0],

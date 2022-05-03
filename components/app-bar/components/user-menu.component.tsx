@@ -1,4 +1,4 @@
-import { Logout, Person } from '@mui/icons-material';
+import { Close, Logout, Person } from '@mui/icons-material';
 import {
     Button,
     Divider,
@@ -11,6 +11,7 @@ import * as React from 'react';
 import { useRecoilState } from 'recoil';
 import { nameAtom } from '../../../atoms/name.atom';
 import { removeNameFromLS } from '../../../util/local-storage.util';
+import { removeCodeFromSs } from '../../../util/session-storage.util';
 
 export const UserMenu: React.FunctionComponent = (): JSX.Element => {
     const [name, setName] = useRecoilState(nameAtom);
@@ -31,7 +32,15 @@ export const UserMenu: React.FunctionComponent = (): JSX.Element => {
     const onSignOutClick = React.useCallback(() => {
         removeNameFromLS();
         setName(null);
+        window.location.reload();
         // TODO clear all else
+
+        handleClose();
+    }, [setName]);
+
+    const onExitGame = React.useCallback(() => {
+        removeCodeFromSs();
+        window.location.reload();
 
         handleClose();
     }, []);
@@ -74,6 +83,13 @@ export const UserMenu: React.FunctionComponent = (): JSX.Element => {
                     <ListItemIcon>
                         <Logout fontSize="small" />
                         <ListItemText>Ausloggen</ListItemText>
+                    </ListItemIcon>
+                </MenuItem>
+
+                <MenuItem onClick={onExitGame}>
+                    <ListItemIcon>
+                        <Close fontSize="small" />
+                        <ListItemText>Spiel verlassen</ListItemText>
                     </ListItemIcon>
                 </MenuItem>
             </Menu>

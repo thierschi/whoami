@@ -33,7 +33,9 @@ export default function handler(
         const name = `${playerName}(guid)${playerGuid}`;
         const game = joinGame(code, name);
 
-        if (_.isNull(game) || game.started) {
+        
+
+        if (_.isNull(game)) {
             res.status(404).json({
                 error: `No game with code ${code} was found!`,
             });

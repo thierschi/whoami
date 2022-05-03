@@ -54,7 +54,6 @@ export default function handler(
     }
 
     const newGame = getGame(code);
-    console.log(newGame?.players);
 
     res.status(200).json(sanitizeGame(game, name));
 }

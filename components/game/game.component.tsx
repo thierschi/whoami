@@ -1,27 +1,31 @@
 import { Box } from '@mui/material';
 import _ from 'lodash';
 import * as React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { gameCodeAtom } from '../../atoms/game-code.atom';
-import { gameSelector } from '../../selectors/game.selector';
+import { useGame } from '../../hook/game.hook';
 import { AppBar } from '../app-bar/app-bar.component';
+import { MainGameScreen } from './components/main-game-screen.component';
 import { MainScreen } from './components/main-screen.component';
 import { NotStartedScreen } from './components/not-started-screen.component';
+import { SetWordScreen } from './components/set-word-screen.component';
 
 export const Game: React.FunctionComponent = (): JSX.Element => {
     const [gameCode, setGameCode] = useRecoilState(gameCodeAtom);
-    const game = useRecoilValue(gameSelector);
+
+    const game = useGame();
 
     const renderDerivedScreen = React.useCallback(() => {
         if (_.isNull(gameCode)) return <MainScreen />;
 
-        if (_.isNull(game)) {
-            setGameCode(null);
-            return <MainScreen />;
-        }
+        if (_.isNull(game)) return <MainScreen />;
 
         if (!game.started) return <NotStartedScreen />;
-    }, [gameCode, setGameCode, game]);
+
+        if (!game.locked) return <SetWordScreen />;
+
+        return <MainGameScreen />;
+    }, [gameCode, game]);
 
     return (
         <Box height="100%" display="flex" flexDirection="column">

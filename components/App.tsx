@@ -1,17 +1,18 @@
-import { NoSsr, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import _ from 'lodash';
 import * as React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { gameCodeAtom } from '../atoms/game-code.atom';
 import { nameAtom } from '../atoms/name.atom';
 import { getNameFromLS } from '../util/local-storage.util';
 import { disableScroll } from '../util/scroll.util';
+import { getCodeFromSs } from '../util/session-storage.util';
 import { Game } from './game/game.component';
 import { NameScreen } from './name-screen/name-screen.component';
 
 export const App: React.FunctionComponent = (): JSX.Element => {
     const theme = useTheme();
-    const gameCode = useRecoilValue(gameCodeAtom);
+    const setGameCode = useSetRecoilState(gameCodeAtom);
 
     const [name, setName] = useRecoilState(nameAtom);
 
@@ -22,7 +23,8 @@ export const App: React.FunctionComponent = (): JSX.Element => {
         setHeight(window.innerHeight);
 
         setName(getNameFromLS());
-    }, [setName, setHeight]);
+        setGameCode(getCodeFromSs());
+    }, [setName, setHeight, setGameCode]);
 
     return (
         <div
@@ -32,11 +34,9 @@ export const App: React.FunctionComponent = (): JSX.Element => {
                 backgroundColor: theme.palette.background.default,
             }}
         >
-            <NoSsr>
-                <React.Suspense fallback={<h1>Loading</h1>}>
-                    {_.isNull(name) ? <NameScreen /> : <Game />}
-                </React.Suspense>
-            </NoSsr>
+            <React.Suspense fallback={<h1>Loading</h1>}>
+                {_.isNull(name) ? <NameScreen /> : <Game />}
+            </React.Suspense>
         </div>
     );
 };
