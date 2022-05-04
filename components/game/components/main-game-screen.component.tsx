@@ -1,3 +1,4 @@
+import { Help, MoreVert } from '@mui/icons-material';
 import {
     Avatar,
     Button,
@@ -5,6 +6,11 @@ import {
     CardActions,
     CardContent,
     CardHeader,
+    IconButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
     Stack,
     Typography,
 } from '@mui/material';
@@ -39,9 +45,25 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
         return game.players.filter((p) => p.name !== name);
     }, [game, name]);
 
+    const me = React.useMemo(() => {
+        if (_.isNull(game) || _.isNull(name)) return null;
+
+        return game.players.filter((p) => p.name === name)[0];
+    }, [game, name]);
+
     React.useEffect(() => {
         enableScroll();
     }, []);
+
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     const colors = [
         red,
@@ -64,6 +86,82 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
                     spacing={2}
                     sx={{ height: '100%' }}
                 >
+                    {!_.isNull(me) && (
+                        <>
+                            <Card
+                                sx={{
+                                    width: '75%',
+                                    margin: 'auto',
+                                    marginTop: '15px',
+                                }}
+                                key={0}
+                            >
+                                <CardHeader
+                                    avatar={
+                                        <Avatar
+                                            sx={{
+                                                bgcolor:
+                                                    colors[
+                                                        0 % colors.length
+                                                    ][500],
+                                            }}
+                                            aria-label="recipe"
+                                        >
+                                            {me.name.charAt(0)}
+                                        </Avatar>
+                                    }
+                                    title={me.name.split('(guid)')[0]}
+                                    subheader="Du"
+                                    action={
+                                        <IconButton
+                                            id="me-settings-button"
+                                            aria-controls={
+                                                open
+                                                    ? 'me-settings-menu'
+                                                    : undefined
+                                            }
+                                            aria-haspopup="true"
+                                            aria-expanded={
+                                                open ? 'true' : undefined
+                                            }
+                                            onClick={handleClick}
+                                        >
+                                            <MoreVert />
+                                        </IconButton>
+                                    }
+                                />
+                            </Card>
+                            <Menu
+                                id="me-settings-menu"
+                                aria-labelledby="me-settings-button"
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleClose}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                            >
+                                <MenuItem
+                                    onClick={() =>
+                                        window.open(
+                                            'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                                            '_blank'
+                                        )
+                                    }
+                                >
+                                    <ListItemIcon>
+                                        <Help fontSize="small" />
+                                        <ListItemText>Tipp</ListItemText>
+                                    </ListItemIcon>
+                                </MenuItem>
+                            </Menu>
+                        </>
+                    )}
                     {players.map((p, i) => (
                         <Card
                             sx={{
@@ -78,7 +176,9 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
                                     <Avatar
                                         sx={{
                                             bgcolor:
-                                                colors[i % colors.length][500],
+                                                colors[
+                                                    (i + 1) % colors.length
+                                                ][500],
                                         }}
                                         aria-label="recipe"
                                     >
