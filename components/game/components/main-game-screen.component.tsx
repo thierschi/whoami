@@ -79,7 +79,7 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
 
     return (
         <Box height="100%" display="flex" flexDirection="column">
-            <Box flex={0}>
+            <Box flex={1}>
                 <Stack
                     alignItems="center"
                     justifyContent="center"
