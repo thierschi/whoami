@@ -238,6 +238,13 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
                     ))}
                 </Stack>
             </Box>
+            {!_.isNull(game) && (
+                <Box flex={0}>
+                    <Typography variant="subtitle2" textAlign="center">
+                        {game.key}
+                    </Typography>
+                </Box>
+            )}
         </Box>
     );
 };

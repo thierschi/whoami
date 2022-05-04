@@ -237,6 +237,9 @@ export const SetWordScreen: React.FunctionComponent = (): JSX.Element => {
                     </Card>
                 </Stack>
             </Box>
+            <Box flex={0} textAlign="center">
+                <Typography variant="subtitle2">{game.key}</Typography>
+            </Box>
         </Box>
     );
 };
