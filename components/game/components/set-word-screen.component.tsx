@@ -150,6 +150,7 @@ export const SetWordScreen: React.FunctionComponent = (): JSX.Element => {
                     ) : (
                         <Divider />
                     )}
+                    <Typography variant="subtitle2">{game.key}</Typography>
                     <Typography variant="body2">
                         {`${
                             game.players.filter((p) => !_.isNull(p.word)).length
@@ -236,9 +237,6 @@ export const SetWordScreen: React.FunctionComponent = (): JSX.Element => {
                         </CardActions>
                     </Card>
                 </Stack>
-            </Box>
-            <Box flex={0} textAlign="center">
-                <Typography variant="subtitle2">{game.key}</Typography>
             </Box>
         </Box>
     );

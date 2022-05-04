@@ -79,7 +79,14 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
 
     return (
         <Box height="100%" display="flex" flexDirection="column">
-            <Box flex={1}>
+            {!_.isNull(game) && (
+                <Box flex={0}>
+                    <Typography variant="subtitle2" textAlign="center">
+                        {game.key}
+                    </Typography>
+                </Box>
+            )}
+            <Box flex={0}>
                 <Stack
                     alignItems="center"
                     justifyContent="center"
@@ -238,13 +245,6 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
                     ))}
                 </Stack>
             </Box>
-            {!_.isNull(game) && (
-                <Box flex={0}>
-                    <Typography variant="subtitle2" textAlign="center">
-                        {game.key}
-                    </Typography>
-                </Box>
-            )}
         </Box>
     );
 };
