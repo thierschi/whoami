@@ -5,7 +5,6 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { gameCodeAtom } from '../atoms/game-code.atom';
 import { nameAtom } from '../atoms/name.atom';
 import { getNameFromLS } from '../util/local-storage.util';
-import { disableScroll } from '../util/scroll.util';
 import { getCodeFromSs } from '../util/session-storage.util';
 import { Game } from './game/game.component';
 import { NameScreen } from './name-screen/name-screen.component';
@@ -19,7 +18,6 @@ export const App: React.FunctionComponent = (): JSX.Element => {
     const [height, setHeight] = React.useState<string | number>('100vh');
 
     React.useEffect(() => {
-        disableScroll();
         setHeight(window.innerHeight);
 
         setName(getNameFromLS());

@@ -4,9 +4,14 @@ import * as React from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { gameCodeAtom } from '../../../atoms/game-code.atom';
 import { nameAtom } from '../../../atoms/name.atom';
+import { disableScroll } from '../../../util/scroll.util';
 import { saveCodeToSs } from '../../../util/session-storage.util';
 
 export const MainScreen = (): JSX.Element => {
+    React.useEffect(() => {
+        disableScroll();
+    }, []);
+
     const setGameCode = useSetRecoilState(gameCodeAtom);
     const name = useRecoilValue(nameAtom);
 

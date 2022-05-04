@@ -5,8 +5,13 @@ import { useSetRecoilState } from 'recoil';
 import { nameAtom } from '../../atoms/name.atom';
 import { guid } from '../../util/guid.util';
 import { saveNameToLS } from '../../util/local-storage.util';
+import { disableScroll } from '../../util/scroll.util';
 
 export const NameScreen: React.FunctionComponent = (): JSX.Element => {
+    React.useEffect(() => {
+        disableScroll();
+    }, []);
+
     const setName = useSetRecoilState(nameAtom);
 
     const [nameString, setNameString] = React.useState<string>();
