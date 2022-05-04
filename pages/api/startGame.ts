@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getGame, sanitizeGame, startGame } from '../../services/game.service';
+import logger from '../../util/logging.util';
 
 export default function handler(
     req: NextApiRequest,
@@ -59,6 +60,11 @@ export default function handler(
         return;
     }
 
+    logger.info(
+        `( ${game.key} ): Game was STARTED by ${
+            name.split('(guid)')[0]
+        }\n\t${name}`
+    );
     res.status(200).json(sanitizeGame(startedGame, name));
     return;
 }

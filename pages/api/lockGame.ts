@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { lockGame, sanitizeGame } from '../../services/game.service';
+import logger from '../../util/logging.util';
 
 export default function handler(
     req: NextApiRequest,
@@ -56,6 +57,11 @@ export default function handler(
         });
     }
 
+    logger.info(
+        `( ${game.key} ): Game was LOCKED by ${
+            name.split('(guid)')[0]
+        }\n\t${name}`
+    );
     res.status(200).json(sanitizeGame(game, name));
     return;
 }

@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { joinGame, sanitizeGame } from '../../services/game.service';
+import logger from '../../util/logging.util';
 
 export default function handler(
     req: NextApiRequest,
@@ -33,8 +34,6 @@ export default function handler(
         const name = `${playerName}(guid)${playerGuid}`;
         const game = joinGame(code, name);
 
-        
-
         if (_.isNull(game)) {
             res.status(404).json({
                 error: `No game with code ${code} was found!`,
@@ -42,6 +41,11 @@ export default function handler(
             return;
         }
 
+        logger.info(
+            `( ${game.key} ): ${name.split('(guid)')[0]} JOINED as player ${
+                game.players.length
+            }\n\t${name}`
+        );
         res.status(200).json(sanitizeGame(game, name));
     } catch (e) {
         res.status(409).json({

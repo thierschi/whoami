@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createNewGame, sanitizeGame } from '../../services/game.service';
+import logger from '../../util/logging.util';
 
 export default function handler(
     req: NextApiRequest,
@@ -31,5 +32,10 @@ export default function handler(
     const name = `${playerName}(guid)${playerGuid}`;
     const game = createNewGame(name);
 
+    logger.info(
+        `( ${game.key} ): Game was CREATED by ${
+            name.split('(guid)')[0]
+        }\n\t${name}`
+    );
     res.status(200).json(sanitizeGame(game, name));
 }

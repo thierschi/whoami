@@ -1,7 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import * as _ from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getGame, sanitizeGame, setWord } from '../../services/game.service';
+import { sanitizeGame, setWord } from '../../services/game.service';
+import logger from '../../util/logging.util';
 
 export default function handler(
     req: NextApiRequest,
@@ -53,7 +54,11 @@ export default function handler(
         return;
     }
 
-    const newGame = getGame(code);
-
+    const partnerName = game.players.filter((p) => p.name === name)[0].partner;
+    logger.info(
+        `( ${game.key} ): ${name.split('(guid)')[0]} SET a word for ${
+            partnerName?.split('(guid)')[0]
+        }\n\t${name}\n\t${partnerName}`
+    );
     res.status(200).json(sanitizeGame(game, name));
 }
