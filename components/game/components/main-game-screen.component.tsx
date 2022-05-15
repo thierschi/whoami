@@ -86,13 +86,7 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
                     </Typography>
                 </Box>
             )}
-            <Box flex={0}>
-                <Stack
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={2}
-                    sx={{ height: '100%' }}
-                >
+            <Box flex={1} overflow="scroll">
                     {!_.isNull(me) && (
                         <>
                             <Card
@@ -243,7 +237,6 @@ export const MainGameScreen: React.FunctionComponent = (): JSX.Element => {
                             )}
                         </Card>
                     ))}
-                </Stack>
             </Box>
         </Box>
     );
