@@ -45,10 +45,10 @@ export const LogoutMenuItem: React.FunctionComponent<IProps> = (
                     Möchtest du dich wirklich ausloggen?
                 </DialogTitle>
                 <DialogActions>
-                    <Button onClick={props.onSignOutClick}>Ausloggen</Button>
                     <Button onClick={handleClose} autoFocus>
                         Abbrechen
                     </Button>
+                    <Button onClick={props.onSignOutClick}>Ausloggen</Button>
                 </DialogActions>
             </Dialog>
         </>
