@@ -27,7 +27,6 @@ export const Notes: React.FunctionComponent = (): JSX.Element => {
 
     React.useEffect(() => {
         const localNotes = getNotesFromLS();
-        console.log(localNotes);
 
         if (_.isNull(localNotes) || localNotes.code !== gameCode) {
             removeNotesFromLS();
