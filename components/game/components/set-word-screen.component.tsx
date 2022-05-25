@@ -68,7 +68,7 @@ export const SetWordScreen: React.FunctionComponent = (): JSX.Element => {
         return game.players.filter((p) => p.name === partnerName)[0];
     }, [game, name]);
 
-    const onWordInputChage = React.useCallback((e: any) => {
+    const onWordInputChange = React.useCallback((e: any) => {
         if (e.target.value.length === 0 || e.target.value.indexOf(delim) > -1) {
             setInputWordIsValid(false);
             setInputWord(e.target.value);
@@ -184,7 +184,7 @@ export const SetWordScreen: React.FunctionComponent = (): JSX.Element => {
                                     required
                                     variant="filled"
                                     sx={{ width: '100%' }}
-                                    onChange={onWordInputChage}
+                                    onChange={onWordInputChange}
                                     error={!inputWordIsValid}
                                     defaultValue={
                                         _.isNull(partner.word)
