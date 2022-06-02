@@ -18,7 +18,6 @@ import {
     red,
     yellow,
 } from '@mui/material/colors';
-import { Box } from '@mui/system';
 import _ from 'lodash';
 import * as React from 'react';
 import { useRecoilValue } from 'recoil';
@@ -78,117 +77,93 @@ export const WordList: React.FunctionComponent = (): JSX.Element => {
     ];
 
     return (
-        <Box height="100%" display="flex" flexDirection="column">
-            {!_.isNull(game) && (
-                <Box flex={0}>
-                    <Typography variant="subtitle2" textAlign="center">
-                        {game.key}
-                    </Typography>
-                </Box>
-            )}
-            <Box flex={1} overflow="scroll">
-                {!_.isNull(me) && (
-                    <>
-                        <Card
-                            sx={{
-                                width: '75%',
-                                margin: 'auto',
-                                marginTop: '15px',
-                            }}
-                            key={0}
-                        >
-                            <CardHeader
-                                avatar={
-                                    <Avatar
-                                        sx={{
-                                            bgcolor:
-                                                colors[0 % colors.length][500],
-                                        }}
-                                        aria-label="recipe"
-                                    >
-                                        {me.name.charAt(0)}
-                                    </Avatar>
-                                }
-                                title={`${me.name.split('(guid)')[0]} (Du)`}
-                                subheader={`von ${me.partner}`}
-                            />
-                        </Card>
-                    </>
-                )}
-                {players.map((p, i) => (
-                    <Card
-                        sx={{
-                            width: '75%',
-                            margin: 'auto',
-                            marginTop: '15px',
-                        }}
-                        key={0}
-                    >
-                        <CardHeader
-                            avatar={
-                                <Avatar
-                                    sx={{
-                                        bgcolor:
-                                            colors[
-                                                (i + 1) % colors.length
-                                            ][500],
-                                    }}
-                                    aria-label="recipe"
-                                >
-                                    {p.name.charAt(0)}
-                                </Avatar>
-                            }
-                            title={p.name}
-                            subheader={`von ${p.partner}`}
-                        />
-
-                        <CardContent>
-                            <Typography
-                                gutterBottom
-                                variant="h5"
-                                component="div"
+        <>
+            {!_.isNull(me) && (
+                <Card
+                    sx={{
+                        width: '75%',
+                        margin: 'auto',
+                        marginTop: '15px',
+                    }}
+                    key={0}
+                >
+                    <CardHeader
+                        avatar={
+                            <Avatar
+                                sx={{
+                                    bgcolor: colors[0 % colors.length][500],
+                                }}
+                                aria-label="recipe"
                             >
-                                {_.isNull(p.word)
-                                    ? ''
-                                    : p.word.split('(delim)')[0]}
-                            </Typography>
-                            {(_.isNull(p.word)
-                                ? ''
-                                : p.word.split('(delim)')[1]) !== '' && (
-                                <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                >
-                                    {_.isNull(p.word)
-                                        ? ''
-                                        : p.word.split('(delim)')[1]}
-                                </Typography>
-                            )}
-                        </CardContent>
+                                {me.name.charAt(0)}
+                            </Avatar>
+                        }
+                        title={`${me.name.split('(guid)')[0]} (Du)`}
+                        subheader={`von ${me.partner}`}
+                    />
+                </Card>
+            )}
+            {players.map((p, i) => (
+                <Card
+                    sx={{
+                        width: '75%',
+                        margin: 'auto',
+                        marginTop: '15px',
+                    }}
+                    key={0}
+                >
+                    <CardHeader
+                        avatar={
+                            <Avatar
+                                sx={{
+                                    bgcolor:
+                                        colors[(i + 1) % colors.length][500],
+                                }}
+                                aria-label="recipe"
+                            >
+                                {p.name.charAt(0)}
+                            </Avatar>
+                        }
+                        title={p.name}
+                        subheader={`von ${p.partner}`}
+                    />
+
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                            {_.isNull(p.word) ? '' : p.word.split('(delim)')[0]}
+                        </Typography>
                         {(_.isNull(p.word)
                             ? ''
-                            : p.word.split('(delim)')[2]) !== '' && (
-                            <CardActions>
-                                <Button
-                                    size="small"
-                                    onClick={() =>
-                                        window.open(
-                                            convertToValidURL(
-                                                _.isNull(p.word)
-                                                    ? ''
-                                                    : p.word.split('(delim)')[2]
-                                            ),
-                                            '_blank'
-                                        )
-                                    }
-                                >
-                                    Mehr Info
-                                </Button>
-                            </CardActions>
+                            : p.word.split('(delim)')[1]) !== '' && (
+                            <Typography variant="body2" color="text.secondary">
+                                {_.isNull(p.word)
+                                    ? ''
+                                    : p.word.split('(delim)')[1]}
+                            </Typography>
                         )}
-                    </Card>
-                ))}
-            </Box>
-        </Box>
+                    </CardContent>
+                    {(_.isNull(p.word) ? '' : p.word.split('(delim)')[2]) !==
+                        '' && (
+                        <CardActions>
+                            <Button
+                                size="small"
+                                onClick={() =>
+                                    window.open(
+                                        convertToValidURL(
+                                            _.isNull(p.word)
+                                                ? ''
+                                                : p.word.split('(delim)')[2]
+                                        ),
+                                        '_blank'
+                                    )
+                                }
+                            >
+                                Mehr Info
+                            </Button>
+                        </CardActions>
+                    )}
+                </Card>
+            ))}
+        </>
     );
 };
