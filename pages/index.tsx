@@ -4,6 +4,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, CssBaseline, NoSsr, ThemeProvider } from '@mui/material';
 import type { NextPage } from 'next';
+import Head from 'next/head';
 import { RecoilRoot } from 'recoil';
 import { App } from '../components/App';
 
@@ -46,6 +47,9 @@ const darkTheme = createTheme({
 const Home: NextPage = () => {
     return (
         <NoSsr>
+            <Head>
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+            </Head>
             <RecoilRoot>
                 <ThemeProvider theme={darkTheme}>
                     <CssBaseline />
