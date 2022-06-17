@@ -6,7 +6,9 @@ import * as React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { gameCodeAtom } from '../../../atoms/game-code.atom';
 import { notesAtom } from '../../../atoms/notes.atom';
+import { INote } from '../../../model/local-storage/local-storage.mode';
 import { invertArray } from '../../../util/array.util';
+import { guid } from '../../../util/guid.util';
 import {
     getNotesFromLS,
     removeNotesFromLS,
@@ -38,7 +40,31 @@ export const Notes: React.FunctionComponent = (): JSX.Element => {
 
     const onSendClick = React.useCallback(() => {
         const newNotes = [...notes];
-        newNotes.push(noteInput);
+        let newNote: INote = {
+            id: guid(),
+            value: noteInput,
+        };
+
+        while (true) {
+            let guidIsUsed = false;
+            for (const note of notes) {
+                if (note.id === newNote.id) {
+                    guidIsUsed = true;
+                    break;
+                }
+            }
+
+            if (!guidIsUsed) {
+                break;
+            }
+
+            newNote = {
+                id: guid(),
+                value: noteInput,
+            };
+        }
+
+        newNotes.push(newNote);
 
         setNotes(newNotes);
         saveNotesToLS({ code: gameCode ?? '', notes: [...newNotes] });
@@ -57,11 +83,21 @@ export const Notes: React.FunctionComponent = (): JSX.Element => {
                             margin: 'auto',
                             marginTop: '15px',
                             padding: '15px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            p: '5px 10px',
                         }}
                         key={i}
                         elevation={2}
                     >
-                        <Typography variant="body2">{v}</Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                flex: 1,
+                            }}
+                        >
+                            {v.value}
+                        </Typography>
                     </Paper>
                 ))}
             </Box>
