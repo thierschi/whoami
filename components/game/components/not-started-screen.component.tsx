@@ -26,6 +26,7 @@ import { nameAtom } from '../../../atoms/name.atom';
 import { useGame } from '../../../hook/game.hook';
 import { useRefreshGame } from '../../../hook/refresh-game.hook';
 import { enableScroll } from '../../../util/scroll.util';
+import { CopyButton } from './copy-button.component';
 
 export const NotStartedScreen = (): JSX.Element => {
     const game = useGame();
@@ -75,7 +76,10 @@ export const NotStartedScreen = (): JSX.Element => {
                     sx={{ height: '100%' }}
                 >
                     <LinearProgress sx={{ width: '100%' }} />
-                    <Typography variant="h3">{game.key}</Typography>
+                    <Box display="flex" flexDirection="row">
+                        <Typography variant="h3">{game.key}</Typography>
+                        <CopyButton content="" />
+                    </Box>
                     <Typography variant="body1">
                         {`${game.players.length} Spieler ${
                             game.players.length === 1 ? 'ist' : 'sind'

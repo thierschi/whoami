@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import _ from 'lodash';
 import * as React from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { gameCodeAtom } from '../../atoms/game-code.atom';
 import { useGame } from '../../hook/game.hook';
 import { AppBar } from '../app-bar/app-bar.component';
@@ -11,7 +11,7 @@ import { NotStartedScreen } from './components/not-started-screen.component';
 import { SetWordScreen } from './components/set-word-screen.component';
 
 export const Game: React.FunctionComponent = (): JSX.Element => {
-    const [gameCode, setGameCode] = useRecoilState(gameCodeAtom);
+    const gameCode = useRecoilValue(gameCodeAtom);
 
     const game = useGame();
 

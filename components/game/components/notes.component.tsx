@@ -26,7 +26,7 @@ export const Notes: React.FunctionComponent = (): JSX.Element => {
     const gameCode = useRecoilValue(gameCodeAtom);
 
     React.useEffect(() => {
-        const localNotes = getNotesFromLS();
+        const localNotes = getNotesFromLS(); 
 
         if (_.isNull(localNotes) || localNotes.code !== gameCode) {
             removeNotesFromLS();

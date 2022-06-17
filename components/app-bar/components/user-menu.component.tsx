@@ -11,6 +11,7 @@ import * as React from 'react';
 import { useRecoilState } from 'recoil';
 import { nameAtom } from '../../../atoms/name.atom';
 import { removeNameFromLS } from '../../../util/local-storage.util';
+import { removeCodeFromQParams } from '../../../util/query-params.util';
 import { removeCodeFromSs } from '../../../util/session-storage.util';
 import { LogoutMenuItem } from './logout-menu-item.component';
 
@@ -32,18 +33,13 @@ export const UserMenu: React.FunctionComponent = (): JSX.Element => {
 
     const onSignOutClick = React.useCallback(() => {
         removeNameFromLS();
-        setName(null);
-        window.location.reload();
-        // TODO clear all else
-
-        handleClose();
-    }, [setName]);
+        removeCodeFromSs();
+        window.location.assign(removeCodeFromQParams());
+    }, []);
 
     const onExitGame = React.useCallback(() => {
         removeCodeFromSs();
-        window.location.reload();
-
-        handleClose();
+        window.location.assign(removeCodeFromQParams());
     }, []);
 
     return (
