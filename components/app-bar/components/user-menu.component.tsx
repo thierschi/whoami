@@ -7,8 +7,10 @@ import {
     Menu,
     MenuItem,
 } from '@mui/material';
+import _ from 'lodash';
 import * as React from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { gameCodeAtom } from '../../../atoms/game-code.atom';
 import { nameAtom } from '../../../atoms/name.atom';
 import { removeNameFromLS } from '../../../util/local-storage.util';
 import { removeCodeFromSs } from '../../../util/session-storage.util';
@@ -16,6 +18,7 @@ import { LogoutMenuItem } from './logout-menu-item.component';
 
 export const UserMenu: React.FunctionComponent = (): JSX.Element => {
     const [name, setName] = useRecoilState(nameAtom);
+    const gameCode = useRecoilValue(gameCodeAtom);
 
     const clearName = React.useMemo(() => name?.split('(guid)')[0], [name]);
 
@@ -80,12 +83,14 @@ export const UserMenu: React.FunctionComponent = (): JSX.Element => {
                     </ListItemIcon>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={onExitGame}>
-                    <ListItemIcon>
-                        <Close fontSize="small" />
-                        <ListItemText>Spiel verlassen</ListItemText>
-                    </ListItemIcon>
-                </MenuItem>
+                {!_.isNull(gameCode) && (
+                    <MenuItem onClick={onExitGame}>
+                        <ListItemIcon>
+                            <Close fontSize="small" />
+                            <ListItemText>Spiel verlassen</ListItemText>
+                        </ListItemIcon>
+                    </MenuItem>
+                )}
                 <LogoutMenuItem onSignOutClick={onSignOutClick} />
             </Menu>
         </>
