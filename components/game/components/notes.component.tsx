@@ -15,6 +15,7 @@ import {
     saveNotesToLS,
 } from '../../../util/local-storage.util';
 import { enableScroll } from '../../../util/scroll.util';
+import { DeleteNoteButton } from './note-delete-button.component';
 
 export const Notes: React.FunctionComponent = (): JSX.Element => {
     React.useEffect(() => {
@@ -98,6 +99,7 @@ export const Notes: React.FunctionComponent = (): JSX.Element => {
                         >
                             {v.value}
                         </Typography>
+                        <DeleteNoteButton guid={v.id} />
                     </Paper>
                 ))}
             </Box>
