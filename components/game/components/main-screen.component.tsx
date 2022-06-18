@@ -6,6 +6,7 @@ import { gameCodeAtom } from '../../../atoms/game-code.atom';
 import { nameAtom } from '../../../atoms/name.atom';
 import { disableScroll } from '../../../util/scroll.util';
 import { saveCodeToSs } from '../../../util/session-storage.util';
+import { ChangeLog } from './changelog.component';
 
 export const MainScreen = (): JSX.Element => {
     React.useEffect(() => {
@@ -73,31 +74,36 @@ export const MainScreen = (): JSX.Element => {
     }, [name, setGameCode]);
 
     return (
-        <Stack
-            alignItems="center"
-            justifyContent="center"
-            spacing={2}
-            sx={{ height: '100%' }}
-        >
-            <Typography variant="h6">
-                Habt ihr bereits einen Gamecode?
-            </Typography>
-            <TextField
-                label="Gamecode"
-                variant="outlined"
-                onChange={onInputChange}
-                error={inputHasError}
-            />
-            <Button variant="contained" onClick={onJoinGameClick}>
-                Beitreten
-            </Button>
-            <Divider />
-            <Divider style={{ width: '90%' }} />
-            <Divider />
-            <Typography variant="h6">Habt ihr noch keinen Gamecode?</Typography>
-            <Button variant="contained" onClick={onCreateGameClick}>
-                Erstellen
-            </Button>
-        </Stack>
+        <>
+            <Stack
+                alignItems="center"
+                justifyContent="center"
+                spacing={2}
+                sx={{ height: '100%' }}
+            >
+                <Typography variant="h6">
+                    Habt ihr bereits einen Gamecode?
+                </Typography>
+                <TextField
+                    label="Gamecode"
+                    variant="outlined"
+                    onChange={onInputChange}
+                    error={inputHasError}
+                />
+                <Button variant="contained" onClick={onJoinGameClick}>
+                    Beitreten
+                </Button>
+                <Divider />
+                <Divider style={{ width: '90%' }} />
+                <Divider />
+                <Typography variant="h6">
+                    Habt ihr noch keinen Gamecode?
+                </Typography>
+                <Button variant="contained" onClick={onCreateGameClick}>
+                    Erstellen
+                </Button>
+            </Stack>
+            <ChangeLog />
+        </>
     );
 };
