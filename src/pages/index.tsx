@@ -1,17 +1,23 @@
-import { trpc } from 'utils/trpc';
+import { gameValidator } from '../service/game';
+import { trpc } from '../utils/trpc';
 
 export default function IndexPage() {
-  const add = trpc.useMutation(['add']);
-  trpc.useSubscription(['onAdd'], {
-    onNext(data) {
-      console.log(data);
-    },
-  });
+  const createGame = trpc.useMutation(['createGame']);
+
+  const onClick = async () => {
+    const g = gameValidator.parse(
+      await createGame.mutateAsync({
+        displayName: 'Lukas',
+        id: '4109a65d-1f87-45f1-8682-e749f1a6a17b',
+      }),
+    );
+    console.log(g);
+  };
 
   return (
     <>
       <h1>Hi</h1>
-      <button onClick={() => add.mutate({ text: 'cock' })}>Click me</button>
+      <button onClick={onClick}>Click me</button>
     </>
   );
 }

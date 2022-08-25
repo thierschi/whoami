@@ -4,8 +4,8 @@ import { createWSClient, wsLink } from '@trpc/client/links/wsLink';
 import { withTRPC } from '@trpc/next';
 import getConfig from 'next/config';
 import { AppType } from 'next/dist/shared/lib/utils';
-import type { AppRouter } from 'server/routers/_app';
 import superjson from 'superjson';
+import { AppRouter } from '../server/routers/_app';
 
 const { publicRuntimeConfig } = getConfig();
 

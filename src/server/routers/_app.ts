@@ -3,8 +3,10 @@
  */
 import * as trpc from '@trpc/server';
 import { EventEmitter } from 'events';
+
 import superjson from 'superjson';
 import { z } from 'zod';
+import { createNewGame, userValidator } from '../../service/game';
 import { createRouter } from '../createRouter';
 
 const ee = new EventEmitter();
@@ -50,6 +52,11 @@ export const appRouter = createRouter()
     async resolve({ ctx, input }) {
       ee.emit('add', input);
     },
+  })
+  .mutation('createGame', {
+    input: userValidator,
+    async resolve({ ctx, input }) {
+      return createNewGame(input);
+    },
   });
-
 export type AppRouter = typeof appRouter;
