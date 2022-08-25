@@ -1,14 +1,17 @@
-import type { NextPage } from 'next';
-import { trpc } from '../util/trpc';
+import { trpc } from 'utils/trpc';
 
-const Home: NextPage = () => {
-    const hello = trpc.useQuery(['hello', { text: 'Lukas' }]);
+export default function IndexPage() {
+  const add = trpc.useMutation(['add']);
+  trpc.useSubscription(['onAdd'], {
+    onNext(data) {
+      console.log(data);
+    },
+  });
 
-    if (hello.isLoading) return <h1>Loading...</h1>;
-
-    if (hello.data) return <h1>{hello.data.greeting}</h1>;
-
-    return <h1>Hello</h1>;
-};
-
-export default Home;
+  return (
+    <>
+      <h1>Hi</h1>
+      <button onClick={() => add.mutate({ text: 'cock' })}>Click me</button>
+    </>
+  );
+}
