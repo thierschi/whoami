@@ -1,23 +1,37 @@
-import { gameValidator } from '../service/game';
+import _ from 'lodash';
+import React from 'react';
+import { IUser, userValidator } from '../service/user/types';
 import { trpc } from '../utils/trpc';
 
 export default function IndexPage() {
-  const createGame = trpc.useMutation(['createGame']);
+  const createUser = trpc.useMutation(['createUser']);
+  const changeUserName = trpc.useMutation(['changeUserName']);
+
+  const [user, setUser] = React.useState<IUser | null>(null);
+
+  React.useEffect(() => console.log(user), [user]);
 
   const onClick = async () => {
-    const g = gameValidator.parse(
-      await createGame.mutateAsync({
-        displayName: 'Lukas',
-        id: '4109a65d-1f87-45f1-8682-e749f1a6a17b',
-      }),
-    );
-    console.log(g);
+    const rUser = await createUser.mutateAsync('Lukas');
+
+    setUser(userValidator.parse(rUser));
+  };
+
+  const onClickChange = async () => {
+    if (_.isNull(user)) return;
+
+    const newUser = await changeUserName.mutateAsync({
+      ...user,
+      name: 'thierschi',
+    });
+    setUser(userValidator.parse(newUser));
   };
 
   return (
     <>
       <h1>Hi</h1>
-      <button onClick={onClick}>Click me</button>
+      <button onClick={onClick}>click me</button>
+      <button onClick={onClickChange}>click me</button>
     </>
   );
 }

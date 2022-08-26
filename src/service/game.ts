@@ -1,27 +1,6 @@
+import * as trpc from '@trpc/server';
 import _ from 'lodash';
-import { z } from 'zod';
-
-export const userValidator = z.object({
-  displayName: z.string().min(1),
-  id: z.string().uuid(),
-});
-
-export const gameValidator = z.object({
-  key: z.string().min(5).max(5),
-  host: userValidator,
-  players: z.array(
-    z.object({
-      user: userValidator,
-      word: z.string().nullable(),
-      selectsWordFor: userValidator.nullable(),
-    }),
-  ),
-  started: z.boolean(),
-  locked: z.boolean(),
-});
-
-export type IUser = z.infer<typeof userValidator>;
-export type IGame = z.infer<typeof gameValidator>;
+import { IGame, IPlayer } from './game.model';
 
 const games: IGame[] = [
   {
@@ -77,7 +56,7 @@ const games: IGame[] = [
   },
 ];
 
-export const createNewGame = (user: IUser): IGame => {
+export const createNewGame = (user: IPlayer): IGame => {
   while (true) {
     let characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789';
     let code = '';
@@ -115,17 +94,24 @@ export const getGame = (code: string): IGame | null => {
   return game;
 };
 
-export const joinGame = (code: string, user: IUser): IGame | null => {
+export const joinGame = (code: string, user: IPlayer): IGame | null => {
   let game: IGame | null = getGame(code);
 
-  if (_.isNull(game)) throw new Error(`No game with code ${code} exists.`);
+  if (_.isNull(game))
+    throw new trpc.TRPCError({
+      code: 'NOT_FOUND',
+      message: `The game with code ${code} was not found.`,
+    });
 
   const playerWithName = game.players.filter(
     (p) => p.user.displayName === user.displayName,
   )[0];
 
   if (!_.isUndefined(playerWithName) && playerWithName.user.id !== user.id) {
-    throw new Error('Name is taken');
+    throw new trpc.TRPCError({
+      code: 'CONFLICT',
+      message: `There is already a user with name ${user.displayName} joined in the game ${code}`,
+    });
   }
 
   const player = game.players.filter((p) => p.user.id === user.id)[0];
@@ -139,81 +125,123 @@ export const joinGame = (code: string, user: IUser): IGame | null => {
   return game;
 };
 
-// export const startGame = (code: string): IGame | null => {
-//   let game: IGame | null = getGame(code);
+export const startGame = (code: string): IGame | null => {
+  let game: IGame | null = getGame(code);
 
-//   if (_.isNull(game)) return null;
-//   if (game.players.length <= 1) return null;
+  if (_.isNull(game)) {
+    throw new trpc.TRPCError({
+      code: 'NOT_FOUND',
+      message: `The game with code ${code} was not found.`,
+    });
+  }
+  if (game.players.length <= 1) {
+    throw new trpc.TRPCError({
+      code: 'PRECONDITION_FAILED',
+      message: 'A game must have 2 or more players to be started.',
+    });
+  }
 
-//   while (true) {
-//     const players = [...game.players];
-//     let playerNames = players.map((e) => e.name);
-//     const newGame: IGame = { ...game, started: true, players: [] };
+  while (true) {
+    const players = [...game.players];
+    let users = players.map((e) => e.user);
+    const newGame: IGame = { ...game, started: true, players: [] };
 
-//     for (const p of players) {
-//       const player = { ...p };
+    for (const p of players) {
+      const newPlayer = { ...p };
 
-//       const r = Math.floor(Math.random() * playerNames.length);
-//       player.partner = playerNames[r];
-//       playerNames = playerNames.filter((e) => e !== player.partner);
+      const r = Math.floor(Math.random() * users.length);
+      newPlayer.selectsWordFor = users[r];
+      users = users.filter((u) => u.id !== newPlayer.selectsWordFor?.id);
 
-//       newGame.players.push(player);
-//     }
+      newGame.players.push(newPlayer);
+    }
 
-//     let allGood = true;
+    let allGood = true;
 
-//     for (const p of newGame.players) {
-//       if (p.name === p.partner) {
-//         allGood = false;
-//         break;
-//       }
-//     }
+    for (const p of newGame.players) {
+      if (p.user.id === p.selectsWordFor?.id) {
+        allGood = false;
+        break;
+      }
+    }
 
-//     if (!allGood) continue;
+    if (!allGood) continue;
 
-//     game.players = newGame.players;
-//     game.started = true;
-//     return game;
-//   }
-// };
+    game.players = newGame.players;
+    game.started = true;
+    return game;
+  }
+};
 
-// export const setWord = (
-//   code: string,
-//   name: string,
-//   word: string,
-// ): IGame | null => {
-//   const game = getGame(code);
+export const setWord = (code: string, user: IPlayer, word: string): IGame => {
+  const game = getGame(code);
 
-//   if (
-//     _.isNull(game) ||
-//     game.players.filter((g) => g.name === name).length === 0 ||
-//     game.locked ||
-//     !game.started
-//   )
-//     return null;
+  if (_.isNull(game)) {
+    throw new trpc.TRPCError({
+      code: 'NOT_FOUND',
+      message: `The game with code ${code} was not found.`,
+    });
+  }
 
-//   const partnerName = game.players.filter((g) => g.name === name)[0].partner;
-//   const partner = game.players.filter((g) => g.name === partnerName)[0];
-//   partner.word = word;
+  if (game.players.filter((g) => g.user.id === user.id).length === 0) {
+    throw new trpc.TRPCError({
+      code: 'UNAUTHORIZED',
+      message: `You are not a player of game ${code}.`,
+    });
+  }
 
-//   return game;
-// };
+  if (game.locked || !game.started) {
+    throw new trpc.TRPCError({
+      code: 'PRECONDITION_FAILED',
+      message: `A word cannot be set, because the game is either locked or not started yet.`,
+    });
+  }
 
-// export const lockGame = (code: string, name: string): IGame | null => {
-//   const game = getGame(code);
+  const selectWordFor = game.players.filter((g) => g.user.id === user.id)[0]
+    .selectsWordFor;
+  const partner = game.players.filter(
+    (g) => g.user.id === selectWordFor?.id,
+  )[0];
+  partner.word = word;
 
-//   if (_.isNull(game) || game.locked || !game.started) return null;
+  return game;
+};
 
-//   if (game.host !== name) return game;
+export const lockGame = (code: string, user: IPlayer): IGame => {
+  const game = getGame(code);
 
-//   if (game.players.filter((p) => _.isNull(p.word)).length > 0) {
-//     return game;
-//   }
+  if (_.isNull(game)) {
+    throw new trpc.TRPCError({
+      code: 'NOT_FOUND',
+      message: `The game with code ${code} was not found.`,
+    });
+  }
 
-//   game.locked = true;
+  if (game.host.id !== user.id) {
+    throw new trpc.TRPCError({
+      code: 'UNAUTHORIZED',
+      message: `You are not the host of game ${code}.`,
+    });
+  }
 
-//   return game;
-// };
+  if (game.locked || !game.started) {
+    throw new trpc.TRPCError({
+      code: 'PRECONDITION_FAILED',
+      message: `A word cannot be set, because the game is either locked or not started yet.`,
+    });
+  }
+
+  if (game.players.filter((p) => _.isNull(p.word)).length > 0) {
+    throw new trpc.TRPCError({
+      code: 'PRECONDITION_FAILED',
+      message: 'One or more players do not have a word set yet.',
+    });
+  }
+
+  game.locked = true;
+
+  return game;
+};
 
 // export const sanitizeGame = (game_: IGame, name: string): ISanitizedGame => {
 //   const game = { ...game_ };

@@ -6,7 +6,10 @@ import { EventEmitter } from 'events';
 
 import superjson from 'superjson';
 import { z } from 'zod';
-import { createNewGame, userValidator } from '../../service/game';
+import { createNewGame, getGame, joinGame } from '../../service/game';
+import { playerValidator } from '../../service/game.model';
+import { changeUserName, createNewUser } from '../../service/user';
+import { userValidator } from '../../service/user/types';
 import { createRouter } from '../createRouter';
 
 const ee = new EventEmitter();
@@ -54,9 +57,34 @@ export const appRouter = createRouter()
     },
   })
   .mutation('createGame', {
-    input: userValidator,
+    input: playerValidator,
     async resolve({ ctx, input }) {
       return createNewGame(input);
+    },
+  })
+  .mutation('joinGame', {
+    input: z.object({ user: playerValidator, code: z.string().min(5).max(5) }),
+    async resolve({ ctx, input }) {
+      console.log('joinGame');
+      return joinGame(input.code, input.user);
+    },
+  })
+  .query('getGame', {
+    input: z.string().min(5).max(5),
+    async resolve({ ctx, input }) {
+      return getGame(input);
+    },
+  })
+  .mutation('createUser', {
+    input: z.string().min(1),
+    async resolve({ ctx, input }) {
+      return createNewUser(input);
+    },
+  })
+  .mutation('changeUserName', {
+    input: userValidator,
+    async resolve({ ctx, input }) {
+      return changeUserName(input);
     },
   });
 export type AppRouter = typeof appRouter;
