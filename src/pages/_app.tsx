@@ -2,6 +2,7 @@ import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { createWSClient, wsLink } from '@trpc/client/links/wsLink';
 import { withTRPC } from '@trpc/next';
+import { SessionProvider } from 'next-auth/react';
 import getConfig from 'next/config';
 import { AppType } from 'next/dist/shared/lib/utils';
 import superjson from 'superjson';
@@ -11,8 +12,15 @@ const { publicRuntimeConfig } = getConfig();
 
 const { APP_URL, WS_URL } = publicRuntimeConfig;
 
-const MyApp: AppType = ({ Component, pageProps }) => {
-  return <Component {...pageProps} />;
+const MyApp: AppType = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}) => {
+  return (
+    <SessionProvider session={session}>
+      <Component {...pageProps} />
+    </SessionProvider>
+  );
 };
 
 function getEndingLink() {
@@ -58,16 +66,19 @@ export default withTRPC<AppRouter>({
        * @link https://react-query.tanstack.com/reference/QueryClient
        */
       queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
-      headers: () => {
-        if (ctx?.req) {
-          // on ssr, forward client's headers to the server
-          return {
-            ...ctx.req.headers,
-            'x-ssr': '1',
-          };
-        }
-        return {};
-      },
+      headers: { test: 'test' },
+      // () => {
+      //   return { Test: 'this is a test' };
+
+      //   // if (ctx?.req) {
+      //   //   // on ssr, forward client's headers to the server
+      //   //   return {
+      //   //     ...ctx.req.headers,
+      //   //     'x-ssr': '1',
+      //   //     Test: 'this is a test',
+      //   //   };
+      //   // }
+      // },
     };
   },
   /**

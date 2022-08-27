@@ -6,10 +6,9 @@ import { EventEmitter } from 'events';
 
 import superjson from 'superjson';
 import { z } from 'zod';
+import { createNewGuestUser } from '../../auth/guestUsers';
 import { createNewGame, getGame, joinGame } from '../../service/game';
 import { playerValidator } from '../../service/game.model';
-import { changeUserName, createNewUser } from '../../service/user';
-import { userValidator } from '../../service/user/types';
 import { createRouter } from '../createRouter';
 
 const ee = new EventEmitter();
@@ -75,16 +74,18 @@ export const appRouter = createRouter()
       return getGame(input);
     },
   })
-  .mutation('createUser', {
-    input: z.string().min(1),
+  .mutation('registerGuestUser', {
+    input: z.string(),
     async resolve({ ctx, input }) {
-      return createNewUser(input);
+      const user = await createNewGuestUser(input);
+
+      return user;
     },
   })
-  .mutation('changeUserName', {
-    input: userValidator,
-    async resolve({ ctx, input }) {
-      return changeUserName(input);
+  .mutation('ping', {
+    async resolve({ ctx }) {
+      return ctx;
     },
   });
+
 export type AppRouter = typeof appRouter;
