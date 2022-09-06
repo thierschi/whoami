@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
+import { IUser, userValidator } from '../../service/user/types';
 import { guestUserValidator, IGuestUser } from './types';
 
 const prisma = new PrismaClient();
@@ -25,4 +26,12 @@ export const createNewGuestUser = async (name: string): Promise<IGuestUser> => {
   };
 
   return guestUserValidator.parse(newGuestUser);
+};
+
+export const getUser = async (id: string): Promise<IUser | null> => {
+  const user = await prisma.user.findUnique({
+    where: { id: id },
+  });
+
+  return userValidator.nullable().parse(user);
 };

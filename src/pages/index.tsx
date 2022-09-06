@@ -1,3 +1,4 @@
+import { signOut } from 'next-auth/react';
 import Cookies from 'universal-cookie';
 import { trpc } from '../utils/trpc';
 
@@ -18,6 +19,7 @@ export default function IndexPage() {
     <>
       <h1>Hello</h1>
       <button onClick={onClick}>Click me</button>
+      <button onClick={() => signOut()}>Log out</button>
       <button onClick={() => ping.mutateAsync().then(console.log)}>ping</button>
     </>
   );
