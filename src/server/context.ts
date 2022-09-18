@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import * as trpc from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
 import { NodeHTTPCreateContextFnOptions } from '@trpc/server/adapters/node-http';
@@ -6,8 +5,10 @@ import { IncomingMessage } from 'http';
 import _ from 'lodash';
 import { getSession } from 'next-auth/react';
 import ws from 'ws';
+import { getUserByEmail, getUserById } from '../auth/users';
+import { getPrismaClient } from '../service/db';
 
-const prisma = new PrismaClient();
+const prisma = getPrismaClient();
 
 /**
  * Creates context for an incoming request
@@ -26,18 +27,20 @@ export const createContext = async ({
     const userMail = session.user?.email;
 
     if (!_.isNull(userMail)) {
-      const dbUser = await prisma.user.findUnique({
-        where: { email: userMail },
-      });
+      const dbUser = await getUserByEmail(session.user?.email ?? '');
 
-      user = {
-        name: dbUser?.name,
-        id: dbUser?.id,
-      };
+      if (!_.isNull(dbUser)) {
+        user = dbUser;
+      }
     }
   }
 
-  if (_.isNull(user)) {
+  if (
+    _.isNull(user) &&
+    !_.isUndefined(req.headers.cookie) &&
+    req.headers.cookie?.indexOf('whoami.guest.id') > -1 &&
+    req.headers.cookie?.indexOf('whoami.guest.secret') > -1
+  ) {
     const cookies = req.headers.cookie
       ?.split(';')
       .map((e) => e.replace(/^\s*/g, '').split('='));
@@ -57,9 +60,7 @@ export const createContext = async ({
       : decodeURIComponent(guestSecretEncoded);
 
     if (!_.isUndefined(guestId) && !_.isUndefined(guestSecret)) {
-      const dbUser = await prisma.user.findUnique({
-        where: { id: guestId },
-      });
+      const dbUser = await getUserById(guestId);
       const dbSecret = await prisma.guestSecret.findUnique({
         where: { userId: guestId },
       });
@@ -69,10 +70,7 @@ export const createContext = async ({
         !_.isNull(dbSecret) &&
         dbSecret.secret === guestSecret
       ) {
-        user = {
-          name: dbUser.name,
-          id: dbUser.id,
-        };
+        user = dbUser;
       }
     }
   }

@@ -1,26 +1,37 @@
-import { signOut } from 'next-auth/react';
-import Cookies from 'universal-cookie';
-import { trpc } from '../utils/trpc';
+import _ from 'lodash';
+import React from 'react';
+import {
+  useGuestSignIn,
+  useMe,
+  useSignIn,
+  useSignOut,
+} from '../auth/users/hooks';
 
 export default function IndexPage() {
-  const regUser = trpc.useMutation(['registerGuestUser']);
-  const ping = trpc.useMutation(['ping']);
+  const me = useMe();
 
-  const onClick = async () => {
-    const user = await regUser.mutateAsync('Lukas');
-    console.log(user);
+  const signIn = useSignIn();
+  const guestSignIn = useGuestSignIn();
+  const signOut = useSignOut();
 
-    const cookies = new Cookies();
-    cookies.set('whoami.guest.id', user.id);
-    cookies.set('whoami.guest.secret', user.secret);
-  };
+  const [userName, setUserName] = React.useState<string>('');
 
   return (
     <>
-      <h1>Hello</h1>
-      <button onClick={onClick}>Click me</button>
-      <button onClick={() => signOut()}>Log out</button>
-      <button onClick={() => ping.mutateAsync().then(console.log)}>ping</button>
+      <input onChange={(e) => setUserName(e.target.value)} />
+      <h1>{userName}</h1>
+      <button onClick={() => guestSignIn(userName)}>Sign in as guest</button>
+      <button onClick={() => signIn()}>Sign in</button>
+      <button onClick={() => signOut()}>Sign out</button>
+      {!_.isNull(me) && (
+        <>
+          <p>
+            {me.isGuest && 'Guest'} {me.name}
+          </p>
+          <p>{me.email}</p>
+          {!_.isNull(me.image) && <img src={me.image} />}
+        </>
+      )}
     </>
   );
 }

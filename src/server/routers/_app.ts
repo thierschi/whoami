@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 
 import superjson from 'superjson';
 import { z } from 'zod';
-import { createNewGuestUser } from '../../auth/users';
+import { createNewGuestUser, deleteGuestUser } from '../../auth/users';
 import { createNewGame, getGame, joinGame } from '../../service/game';
 import { playerValidator } from '../../service/game.model';
 import { createRouter } from '../createRouter';
@@ -89,7 +89,16 @@ export const appRouter = createRouter()
   })
   .query('me', {
     async resolve({ ctx }) {
-      // TODO
+      console.log(ctx.user);
+      return ctx.user;
+    },
+  })
+  .mutation('signOutGuest', {
+    async resolve({ ctx }) {
+      if (!ctx.user?.isGuest) {
+        return;
+      }
+      deleteGuestUser(ctx.user.id);
     },
   });
 
