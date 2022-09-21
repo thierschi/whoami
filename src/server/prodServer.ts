@@ -1,10 +1,10 @@
-import { createContext } from './context';
-import { appRouter } from './routers/_app';
 import { applyWSSHandler } from '@trpc/server/adapters/ws';
 import http from 'http';
 import next from 'next';
 import { parse } from 'url';
 import ws from 'ws';
+import { createContext } from './context';
+import { appRouter } from './routers/_app';
 
 const port = parseInt(process.env.PORT || '3000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -26,8 +26,16 @@ app.prepare().then(() => {
     const parsedUrl = parse(req.url!, true);
     handle(req, res, parsedUrl);
   });
+
   const wss = new ws.Server({ server });
   const handler = applyWSSHandler({ wss, router: appRouter, createContext });
+
+  wss.on('connection', (ws) => {
+    console.log(`✚✚ Connection (${wss.clients.size})`);
+    ws.once('close', () => {
+      console.log(`-- Connection (${wss.clients.size})`);
+    });
+  });
 
   process.on('SIGTERM', () => {
     console.log('SIGTERM');

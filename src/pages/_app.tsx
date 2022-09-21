@@ -5,8 +5,10 @@ import { withTRPC } from '@trpc/next';
 import { SessionProvider } from 'next-auth/react';
 import getConfig from 'next/config';
 import { AppType } from 'next/dist/shared/lib/utils';
+import Head from 'next/head';
 import superjson from 'superjson';
 import { AppRouter } from '../server/routers/_app';
+import '../styles/global.css';
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -17,9 +19,21 @@ const MyApp: AppType = ({
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
+    <>
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        />
+      </Head>
+      <SessionProvider session={session}>
+        <Component {...pageProps} />
+      </SessionProvider>
+    </>
   );
 };
 

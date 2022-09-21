@@ -7,8 +7,6 @@ import { EventEmitter } from 'events';
 import superjson from 'superjson';
 import { z } from 'zod';
 import { createNewGuestUser, deleteGuestUser } from '../../auth/users';
-import { createNewGame, getGame, joinGame } from '../../service/game';
-import { playerValidator } from '../../service/game.model';
 import { createRouter } from '../createRouter';
 
 const ee = new EventEmitter();
@@ -25,6 +23,7 @@ export interface Post {
  */
 export const appRouter = createRouter()
   .transformer(superjson)
+  // TEMPLATE WS
   .subscription('onAdd', {
     resolve({ ctx }) {
       // `resolve()` is triggered for each client when they start subscribing `onAdd`
@@ -47,6 +46,7 @@ export const appRouter = createRouter()
       });
     },
   })
+  // TEMPLATE WS
   .mutation('add', {
     input: z.object({
       text: z.string().min(1),
@@ -55,25 +55,7 @@ export const appRouter = createRouter()
       ee.emit('add', input);
     },
   })
-  .mutation('createGame', {
-    input: playerValidator,
-    async resolve({ ctx, input }) {
-      return createNewGame(input);
-    },
-  })
-  .mutation('joinGame', {
-    input: z.object({ user: playerValidator, code: z.string().min(5).max(5) }),
-    async resolve({ ctx, input }) {
-      console.log('joinGame');
-      return joinGame(input.code, input.user);
-    },
-  })
-  .query('getGame', {
-    input: z.string().min(5).max(5),
-    async resolve({ ctx, input }) {
-      return getGame(input);
-    },
-  })
+  // KEEP
   .mutation('registerGuestUser', {
     input: z.string(),
     async resolve({ ctx, input }) {
@@ -82,17 +64,13 @@ export const appRouter = createRouter()
       return user;
     },
   })
-  .mutation('ping', {
-    async resolve({ ctx }) {
-      return ctx;
-    },
-  })
+  // KEEP
   .query('me', {
     async resolve({ ctx }) {
-      console.log(ctx.user);
       return ctx.user;
     },
   })
+  // KEEP
   .mutation('signOutGuest', {
     async resolve({ ctx }) {
       if (!ctx.user?.isGuest) {
