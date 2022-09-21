@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useMe } from '../auth/users/hooks';
@@ -16,6 +17,7 @@ export default function IndexPage() {
   return (
     <>
       <h1>Start</h1>
+      <button onClick={() => signIn()}>Start</button>
     </>
   );
 }

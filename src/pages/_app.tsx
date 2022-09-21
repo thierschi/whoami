@@ -1,3 +1,4 @@
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { createWSClient, wsLink } from '@trpc/client/links/wsLink';
@@ -5,7 +6,6 @@ import { withTRPC } from '@trpc/next';
 import { SessionProvider } from 'next-auth/react';
 import getConfig from 'next/config';
 import { AppType } from 'next/dist/shared/lib/utils';
-import Head from 'next/head';
 import superjson from 'superjson';
 import { AppRouter } from '../server/routers/_app';
 import '../styles/global.css';
@@ -14,26 +14,23 @@ const { publicRuntimeConfig } = getConfig();
 
 const { APP_URL, WS_URL } = publicRuntimeConfig;
 
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
 const MyApp: AppType = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <>
-      <Head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-        />
-      </Head>
-      <SessionProvider session={session}>
+    <SessionProvider session={session}>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
         <Component {...pageProps} />
-      </SessionProvider>
-    </>
+      </ThemeProvider>
+    </SessionProvider>
   );
 };
 
