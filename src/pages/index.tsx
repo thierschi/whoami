@@ -10,7 +10,7 @@ export default function IndexPage() {
 
   React.useEffect(() => {
     if (!_.isNull(me)) {
-      router.push('home');
+      router.push('/game');
     }
   }, [me]);
 

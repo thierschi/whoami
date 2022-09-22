@@ -1,9 +1,14 @@
 import _ from 'lodash';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import React from 'react';
-import Cookies from 'universal-cookie';
+import Cookies, { CookieSetOptions } from 'universal-cookie';
 import { trpc } from '../../utils/trpc';
 import { IUser } from './types';
+
+const cookieOptions: CookieSetOptions = {
+  path: '/',
+  expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+};
 
 export const useMe = () => {
   const [user, setUser] = React.useState<IUser | null>(null);
@@ -35,13 +40,13 @@ export const useGuestSignIn = () => {
   const regGuestUser = trpc.useMutation(['registerGuestUser']);
 
   const signInCallback = React.useCallback(
-    async (name: string) => {
+    async (name: string, callbackUrl?: string) => {
       const user = await regGuestUser.mutateAsync(name);
 
       const cookies = new Cookies();
-      cookies.set('whoami.guest.id', user.id);
-      cookies.set('whoami.guest.secret', user.secret);
-      window.location.reload();
+      cookies.set('whoami.guest.id', user.id, cookieOptions);
+      cookies.set('whoami.guest.secret', user.secret, cookieOptions);
+      window.location.replace(_.isUndefined(callbackUrl) ? '/' : callbackUrl);
     },
     [regGuestUser],
   );
@@ -59,13 +64,15 @@ export const useSignOut = () => {
         signOutGuest.mutate();
 
         const cookies = new Cookies();
-        cookies.remove('whoami.guest.id');
-        cookies.remove('whoami.guest.secret');
+        cookies.remove('whoami.guest.id', cookieOptions);
+        cookies.remove('whoami.guest.secret', cookieOptions);
 
-        window.location.reload();
+        window.location.replace('/');
       };
     }
-    return signOut;
+    return () => {
+      signOut({ callbackUrl: '/' });
+    };
   }, [session]);
 
   return signOutCallback;
