@@ -48,6 +48,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   guestSecret   GuestSecret?
+  lastSeen      DateTime  @default(now())
 }
 
 model VerificationToken {

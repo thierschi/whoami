@@ -5,7 +5,7 @@ import { IncomingMessage } from 'http';
 import _ from 'lodash';
 import { getSession } from 'next-auth/react';
 import ws from 'ws';
-import { getUserByEmail, getUserById } from '../auth/users';
+import { User } from '../auth/users';
 import { getPrismaClient } from '../service/db';
 
 const prisma = getPrismaClient();
@@ -27,7 +27,7 @@ export const createContext = async ({
     const userMail = session.user?.email;
 
     if (!_.isNull(userMail)) {
-      const dbUser = await getUserByEmail(session.user?.email ?? '');
+      const dbUser = await User.getByEmail(session.user?.email ?? '');
 
       if (!_.isNull(dbUser)) {
         user = dbUser;
@@ -60,7 +60,7 @@ export const createContext = async ({
       : decodeURIComponent(guestSecretEncoded);
 
     if (!_.isUndefined(guestId) && !_.isUndefined(guestSecret)) {
-      const dbUser = await getUserById(guestId);
+      const dbUser = await User.getById(guestId);
       const dbSecret = await prisma.guestSecret.findUnique({
         where: { userId: guestId },
       });

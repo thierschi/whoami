@@ -5,7 +5,7 @@ import { guestUserValidator, IGuestUser, IUser } from './types';
 
 const prisma = new PrismaClient();
 
-export const createNewGuestUser = async (name: string): Promise<IGuestUser> => {
+const createNewGuestUser = async (name: string): Promise<IGuestUser> => {
   const secret = crypto.randomBytes(2048).toString('base64');
 
   const newUser = await prisma.user.create({
@@ -28,11 +28,11 @@ export const createNewGuestUser = async (name: string): Promise<IGuestUser> => {
   return guestUserValidator.parse(newGuestUser);
 };
 
-export const deleteGuestUser = async (id: string): Promise<void> => {
+const deleteGuestUser = async (id: string): Promise<void> => {
   await prisma.user.delete({ where: { id: id } });
 };
 
-export const getUserById = async (id: string): Promise<IUser | null> => {
+const getUserById = async (id: string): Promise<IUser | null> => {
   const dbUser = await prisma.user.findUnique({
     where: { id: id },
   });
@@ -50,7 +50,7 @@ export const getUserById = async (id: string): Promise<IUser | null> => {
   };
 };
 
-export const getUserByEmail = async (email: string): Promise<IUser | null> => {
+const getUserByEmail = async (email: string): Promise<IUser | null> => {
   const dbUser = await prisma.user.findUnique({
     where: { email: email },
   });
@@ -66,4 +66,23 @@ export const getUserByEmail = async (email: string): Promise<IUser | null> => {
     image: dbUser.image,
     isGuest: dbUser.isGuest,
   };
+};
+
+const updateLastSeen = async (id: string): Promise<void> => {
+  await prisma.user.update({
+    where: { id: id },
+    data: {
+      lastSeen: new Date(),
+    },
+  });
+};
+
+export const User = {
+  guest: {
+    createNew: createNewGuestUser,
+    delete: deleteGuestUser,
+  },
+  getById: getUserById,
+  getByEmail: getUserByEmail,
+  updateLastSeen: updateLastSeen,
 };
